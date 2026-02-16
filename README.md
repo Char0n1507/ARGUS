@@ -1,7 +1,7 @@
 # 👁️ ARGUS (Advanced Reconnaissance & Guardian Utility System)
 > *The All-Seeing Network Eye. An Enterprise-Grade Anomaly Detection System.*
 
-![ARGUS Logo](./argus_logo.png)
+![ARGUS Logo](./argus_icon.png)
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15-orange)
