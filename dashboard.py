@@ -22,10 +22,10 @@ st.markdown("""
         border: 1px solid #454545;
         padding: 15px;
         border-radius: 5px;
-        color: white;
+        color: #ff4b4b;
     }
     h1, h2, h3 {
-        color: #00ff41 !important; 
+        color: #ff4b4b !important; /* Argus Red */
         font-family: 'Courier New', monospace;
     }
     .main-header {
