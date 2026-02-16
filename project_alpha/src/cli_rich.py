@@ -7,7 +7,7 @@ import time
 console = Console()
 
 def print_banner():
-    banner = """
+    banner = r"""
    ______  ________  ___________ __________
   / _  | / __  /  /  _____/  /  /  _____/
  / /_| |/ /_/ /  /  /  __   /  /  \____ \ 
