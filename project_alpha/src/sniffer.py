@@ -50,7 +50,8 @@ class PacketSniffer:
                     )
                 except (OSError, ValueError):
                     # Fallback: Try default interface if specified one fails
-                    logger.warning(f"Interface '{self.interface}' not found. Falling back to default...")
+                    current_default = conf.iface
+                    logger.warning(f"Interface '{self.interface}' not found. Falling back to default: {current_default}")
                     sniff(
                         iface=None, # Scapy defaults to system default
                         prn=self.callback,
