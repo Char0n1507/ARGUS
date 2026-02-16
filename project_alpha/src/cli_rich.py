@@ -7,11 +7,15 @@ import time
 console = Console()
 
 def print_banner():
-    console.print(Panel.fit(
-        "[bold green]PROJECT ALPHA[/bold green]\n[cyan]Network Anomaly Detector v1.0[/cyan]",
-        subtitle="By Sri Charan Pedhiti",
-        border_style="green"
-    ))
+    banner = """
+   ______  ________  ___________ __________
+  / _  | / __  /  /  _____/  /  /  _____/
+ / /_| |/ /_/ /  /  /  __   /  /  \____ \ 
+/ /__| / _, _/  /  /_\_\ \ /  /____/    /
+\____/ \/ |_|   \________/ \__________/ 
+        ARGUS: The All-Seeing Network Eye
+        """
+    console.print(Panel(banner, style="bold red"))
 
 def print_training_start(packet_count):
     console.print(f"[bold yellow]Starting Training Mode...[/bold yellow]")

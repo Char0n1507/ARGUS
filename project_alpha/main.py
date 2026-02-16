@@ -12,6 +12,9 @@ def load_config(path="project_alpha/config.yaml"):
 def main():
     setup_logging()
     print_banner()
+    print("\n[bold cyan]======================================================[/bold cyan]")
+    print("[bold cyan]        ARGUS - The All-Seeing Eye[/bold cyan]")
+    print("[bold cyan]======================================================[/bold cyan]")
     
     parser = argparse.ArgumentParser(description="Project Alpha: Network Anomaly Detector")
     parser.add_argument("--train", action="store_true", help="Run in training mode to build baseline.")

@@ -1,10 +1,11 @@
-# Project Alpha: AI-Powered Network Anomaly Detector
+# 👁️ ARGUS (Advanced Reconnaissance & Guardian Utility System)
+> *The All-Seeing Network Eye. An Enterprise-Grade Anomaly Detection System.*
 
-![Status](https://img.shields.io/badge/Status-Active-brightgreen)
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![Docker](https://img.shields.io/badge/Docker-Supported-blue)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15-orange)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-**Project Alpha** is a professional-grade network security tool that leverages Machine Learning (Autoencoders) to detect zero-day anomalies in real-time network traffic. Unlike traditional signature-based IDS (like Snort), Project Alpha learns the "baseline" of normal traffic and flags statistical deviations.
+**Argus** is a Next-Gen **Network Detection & Response (NDR)** tool designed to catch "Unknown Unknowns" (Zero-Day Exploits) using Unsupervised Deep Learning. unlike traditional tools that rely on signatures, Argus learns what "Normal" looks like and flags anything that deviates.ions.
 
 ## 🚀 Features
 

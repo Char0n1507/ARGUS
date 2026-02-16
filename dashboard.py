@@ -5,12 +5,13 @@ import sqlite3
 import os
 
 st.set_page_config(
-    page_title="Project Alpha | SOC Dashboard",
-    page_icon="🌍",
+    page_title="ARGUS Dashboard",
+    page_icon="👁️",
     layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# Custom CSS for "Hacker Mode"
+# Custom CSS for Cyberpunk Look
 st.markdown("""
 <style>
     .reportview-container {
@@ -27,11 +28,17 @@ st.markdown("""
         color: #00ff41 !important; 
         font-family: 'Courier New', monospace;
     }
+    .main-header {
+        font-family: 'Courier New', monospace;
+        color: #ff4b4b; /* Argus Red */
+        text-align: center;
+        font-size: 3em;
+        margin-bottom: 0px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🌍 Project Alpha: Global Threat Map")
-st.markdown("### Specialized Operation Center (SOC) View")
+st.markdown('<h1 class="main-header">👁️ ARGUS COMMAND CENTER</h1>', unsafe_allow_html=True)
 
 # Database Connection
 DB_PATH = "forensics.db"
