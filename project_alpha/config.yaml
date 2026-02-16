@@ -1,0 +1,27 @@
+# Project Alpha Configuration
+
+network:
+  # Interface to sniff on. Use "ether" or specific name like "eth0" or "Wi-Fi"
+  interface: "Wi-Fi" 
+  # Number of packets to capture for training baseline
+  train_packet_count: 1000
+  # Number of packets to buffer before running inference
+  inference_batch_size: 10
+
+feature_extraction:
+  # Features to extract [packet_size, protocol_num, dst_port, flags_bitmask]
+  vector_dim: 4
+
+model:
+  # Autoencoder settings
+  encoding_dim: 2
+  epochs: 20
+  batch_size: 32
+  save_path: "model_alpha.keras"
+
+alerting:
+  # Threshold for reconstruction error to be considered an anomaly
+  # This will be auto-calculated during training (e.g., mean + 3*std)
+  # But can be overridden here manually if needed.
+  threshold_override: null
+  log_file: "anomalies.json"

@@ -1,0 +1,39 @@
+import argparse
+import sys
+import yaml
+from project_alpha.logging_config import setup_logging
+from project_alpha.src.detector import AnomalyDetector
+from project_alpha.src.cli_rich import print_banner
+
+def load_config(path="project_alpha/config.yaml"):
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
+
+def main():
+    setup_logging()
+    print_banner()
+    
+    parser = argparse.ArgumentParser(description="Project Alpha: Network Anomaly Detector")
+    parser.add_argument("--train", action="store_true", help="Run in training mode to build baseline.")
+    parser.add_argument("--detect", action="store_true", help="Run in detection mode.")
+    parser.add_argument("--interface", type=str, help="Override network interface from config.")
+    
+    args = parser.parse_args()
+    
+    config = load_config()
+    interface = args.interface if args.interface else config['network']['interface']
+    model_path = config['model']['save_path']
+    
+    detector = AnomalyDetector(interface=interface, model_path=model_path)
+    
+    if args.train:
+        count = config['network']['train_packet_count']
+        detector.train_mode(packet_count=count)
+    elif args.detect:
+        detector.detect_mode()
+    else:
+        parser.print_help()
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

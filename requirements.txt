@@ -1,0 +1,10 @@
+scapy
+tensorflow
+numpy
+pandas
+pyyaml
+rich
+streamlit
+watchdog
+requests
+fpdf
