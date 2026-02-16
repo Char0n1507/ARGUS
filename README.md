@@ -7,7 +7,7 @@
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**Argus** is a Next-Gen **Network Detection & Response (NDR)** tool designed to catch "Unknown Unknowns" (Zero-Day Exploits) using Unsupervised Deep Learning. unlike traditional tools that rely on signatures, Argus learns what "Normal" looks like and flags anything that deviates.ions.
+**Argus** is a Next-Gen **Network Detection & Response (NDR)** tool designed to catch "Unknown Unknowns" (Zero-Day Exploits) using Unsupervised Deep Learning. unlike traditional tools that rely on signatures, Argus learns what "Normal" looks like and flags anything that deviates.
 
 ## 🚀 Features
 
@@ -110,7 +110,7 @@ How does Project Alpha help a Security Operations Center (SOC)?
     -   The `forensics.db` allows analysts to replay historical traffic to see *when* an anomaly started.
 
 ---
-## 🤝 Contributinguration
+## 🤝 Contributing
 
 ## 📊 Configuration
 
