@@ -48,7 +48,7 @@ class PacketSniffer:
                         store=False,
                         stop_filter=lambda x: self.stop_event.is_set()
                     )
-                except OSError:
+                except (OSError, ValueError):
                     # Fallback: Try default interface if specified one fails
                     logger.warning(f"Interface '{self.interface}' not found. Falling back to default...")
                     sniff(

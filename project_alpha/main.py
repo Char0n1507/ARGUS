@@ -10,6 +10,7 @@ sys.path.append(parent_dir)
 from project_alpha.logging_config import setup_logging
 from project_alpha.src.detector import AnomalyDetector
 from project_alpha.src.cli_rich import print_banner
+from scapy.all import get_if_list
 
 def load_config(path="project_alpha/config.yaml"):
     with open(path, "r") as f:
@@ -27,8 +28,15 @@ def main():
     parser.add_argument("--detect", action="store_true", help="Run in detection mode.")
     parser.add_argument("--interface", type=str, help="Override network interface from config.")
     parser.add_argument("--pcap", type=str, help="Path to PCAP file for offline training/detection.")
+    parser.add_argument("--list-interfaces", action="store_true", help="List available network interfaces.")
     
     args = parser.parse_args()
+
+    if args.list_interfaces:
+        print("[bold]Available Network Interfaces:[/bold]")
+        for iface in get_if_list():
+            print(f" - {iface}")
+        sys.exit(0)
     
     config = load_config()
     interface = args.interface if args.interface else config['network']['interface']

@@ -158,7 +158,10 @@ class AnomalyDetector:
         try:
             # Sanitize filename
             safe_time = timestamp.replace(":", "-").replace(" ", "_")
-            filename = f"evidence/alert_{safe_time}_{ip}.pcap"
+            evidence_dir = "evidence"
+            if not os.path.exists(evidence_dir):
+                os.makedirs(evidence_dir)
+            filename = os.path.join(evidence_dir, f"alert_{safe_time}_{ip}.pcap")
             wrpcap(filename, packet)
         except Exception as e:
             logger.error(f"Failed to save evidence: {e}")
