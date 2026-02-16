@@ -11,28 +11,44 @@ class PacketSniffer:
     """
     threaded Packet Sniffer wrapper around Scapy.
     """
-    def __init__(self, interface, callback=None):
+    def __init__(self, interface, callback=None, pcap_path=None):
         self.interface = interface
         self.callback = callback
+        self.pcap_path = pcap_path
         self.stop_event = threading.Event()
         self.thread = None
 
     def start(self):
         """Start sniffing in a background thread."""
-        logger.info(f"Starting capturing on interface {self.interface}...")
+        if self.pcap_path:
+            logger.info(f"Reading packets from file: {self.pcap_path}...")
+        else:
+            logger.info(f"Starting capturing on interface {self.interface}...")
+            
         self.thread = threading.Thread(target=self._sniff_loop)
         self.thread.daemon = True
         self.thread.start()
 
     def _sniff_loop(self):
         try:
-            # simple filter to avoid too much noise for this demo
-            sniff(
-                iface=self.interface,
-                prn=self.callback,
-                store=False,
-                stop_filter=lambda x: self.stop_event.is_set()
-            )
+            if self.pcap_path:
+                # Offline mode
+                sniff(
+                    offline=self.pcap_path,
+                    prn=self.callback,
+                    store=False
+                )
+                logger.info("PCAP processing complete.")
+                # Signal completion if needed, or let the user interrupt
+            else:
+                # Live mode
+                # simple filter to avoid too much noise for this demo
+                sniff(
+                    iface=self.interface,
+                    prn=self.callback,
+                    store=False,
+                    stop_filter=lambda x: self.stop_event.is_set()
+                )
         except Exception as e:
             logger.error(f"Sniffing failed: {e}")
 

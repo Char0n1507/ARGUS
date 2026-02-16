@@ -1,0 +1,11 @@
+# Whitelist Configuration
+# IPs or Subnets to IGNORE (Won't trigger alerts)
+whitelist:
+  - "192.168.1.1"      # Gateway
+  - "8.8.8.8"          # Google DNS
+  - "127.0.0.1"        # Localhost
+
+# Blacklist Configuration
+# IPs that ALWAYS trigger an alert (regardless of AI score)
+blacklist:
+  - "1.1.1.1" # Example bad IP

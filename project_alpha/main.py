@@ -17,6 +17,7 @@ def main():
     parser.add_argument("--train", action="store_true", help="Run in training mode to build baseline.")
     parser.add_argument("--detect", action="store_true", help="Run in detection mode.")
     parser.add_argument("--interface", type=str, help="Override network interface from config.")
+    parser.add_argument("--pcap", type=str, help="Path to PCAP file for offline training/detection.")
     
     args = parser.parse_args()
     
@@ -24,7 +25,7 @@ def main():
     interface = args.interface if args.interface else config['network']['interface']
     model_path = config['model']['save_path']
     
-    detector = AnomalyDetector(interface=interface, model_path=model_path)
+    detector = AnomalyDetector(interface=interface, model_path=model_path, pcap_path=args.pcap)
     
     if args.train:
         count = config['network']['train_packet_count']

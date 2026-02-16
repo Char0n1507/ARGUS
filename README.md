@@ -87,6 +87,28 @@ Traditional firewalls use **Signatures** (like a fingerprint database) to stop k
     python main.py --interface "Wi-Fi" --detect
     ```
 
+## 🛡️ Value in a SOC / Defensive Role
+How does Project Alpha help a Security Operations Center (SOC)?
+
+1.  **Zero-Day Detection (The "Unknown Unknowns")**:
+    -   Traditional Firewalls/IDS rely on signatures (knowing the attack beforehand).
+    -   **Project Alpha** learns "Normal" behavior. If a hacker uses a brand new exploit, the traffic pattern will look "Abnormal" and trigger an alert.
+    -   *Use Case*: Detecting a new Ransomware variant before antivirus vendors release a signature.
+
+2.  **Insider Threat / Data Exfiltration**:
+    -   A rogue employee uploading gigabytes of data to a personal server might use normal protocols (HTTPS), but the **Volume** and **Entropy** will be anomalous.
+    -   *Use Case*: Stopping IP theft.
+
+3.  **C2 Beaconing (Command & Control)**:
+    -   Malware often "phones home" at regular intervals. These small, repetitive packets stand out against random user browsing.
+    -   *Use Case*: Identifying infected hosts that are part of a botnet.
+
+4.  **Forensic Baseline**:
+    -   The `forensics.db` allows analysts to replay historical traffic to see *when* an anomaly started.
+
+---
+## 🤝 Contributinguration
+
 ## 📊 Configuration
 
 Edit `config.yaml` to tune hyperparameters:

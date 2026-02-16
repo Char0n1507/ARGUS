@@ -42,6 +42,14 @@ class AutoEncoder(ModelBase):
         Train the autoencoder. 
         Data should be normalized.
         """
+        # Auto-heal: If model exists but dimensions mismatch, rebuild it.
+        if self.model is not None:
+            expected_dim = self.model.input_shape[1]
+            current_dim = data.shape[1]
+            if expected_dim != current_dim:
+                logger.warning(f"Dimension mismatch! Model expects {expected_dim}, data has {current_dim}. Rebuilding model...")
+                self.model = None
+
         if self.model is None:
             self.build(data.shape[1])
             
@@ -58,7 +66,7 @@ class AutoEncoder(ModelBase):
         # Calculate threshold based on training loss (e.g., max MSE on training set)
         reconstructions = self.model.predict(data)
         train_loss = tf.keras.losses.mse(reconstructions, data)
-        self.threshold = np.mean(train_loss) + 2 * np.std(train_loss)
+        self.threshold = np.mean(train_loss) + 3 * np.std(train_loss)
         logger.info(f"Training complete. Anomaly Threshold set to: {self.threshold:.6f}")
         return history
 

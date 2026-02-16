@@ -1,7 +1,11 @@
+
 import numpy as np
 import logging
 import json
 import time
+import yaml
+import os
+from scapy.all import wrpcap, IP
 from .features import FeatureExtractor
 from .sniffer import PacketSniffer
 from .autoencoder import AutoEncoder
@@ -13,14 +17,18 @@ import re
 logger = logging.getLogger(__name__)
 
 class AnomalyDetector:
-    def __init__(self, interface, model_path=None):
+    def __init__(self, interface, model_path=None, pcap_path=None):
         self.interface = interface
         self.model_path = model_path
+        self.pcap_path = pcap_path
         self.db = ForensicDB()
         self.geo = GeoEnricher()
         self.sniffer = None
         self.feature_extractor = FeatureExtractor()
         self.model = AutoEncoder()
+        self.whitelist = []
+        self.blacklist = []
+        self._load_lists()
         
         # Load model if exists, else we need to train
         try:
@@ -28,11 +36,21 @@ class AnomalyDetector:
         except:
             logger.warning(f"Model {model_path} not found. You must train first.")
 
+    def _load_lists(self):
+        try:
+            with open("whitelist.yaml", "r") as f:
+                data = yaml.safe_load(f)
+                self.whitelist = data.get('whitelist', [])
+                self.blacklist = data.get('blacklist', [])
+        except FileNotFoundError:
+            logger.warning("whitelist.yaml not found. Proceeding without filters.")
+
     def train_mode(self, packet_count=1000):
         """
         Capture packets, extract features, and train the model.
         """
-        logger.info(f"Starting Training Mode. Capturing {packet_count} packets...")
+        source = f"file {self.pcap_path}" if self.pcap_path else f"interface {self.interface}"
+        logger.info(f"Starting Training Mode from {source}. Capturing {packet_count} packets...")
         
         captured_data = []
         
@@ -42,12 +60,15 @@ class AnomalyDetector:
             if len(captured_data) % 100 == 0:
                 logger.info(f"Collected {len(captured_data)}/{packet_count} packets")
 
-        sniffer = PacketSniffer(self.interface, callback=train_callback)
+        sniffer = PacketSniffer(self.interface, callback=train_callback, pcap_path=self.pcap_path)
         sniffer.start()
         
-        # Wait until we have enough packets
+        # Wait until we have enough packets OR pcap finishes
         try:
             while len(captured_data) < packet_count:
+                if self.pcap_path and not sniffer.thread.is_alive():
+                    # PCAP finished
+                    break
                 time.sleep(0.1)
         except KeyboardInterrupt:
             logger.info("Training interrupted by user.")
@@ -71,7 +92,11 @@ class AnomalyDetector:
             logger.error("Model not loaded. Please train first.")
             return
 
-        logger.info(f"Starting Detection Mode on {self.interface}...")
+        if self.pcap_path:
+             logger.info(f"Starting Detection Mode on file {self.pcap_path}...")
+        else:
+             logger.info(f"Starting Detection Mode on {self.interface}...")
+             
         logger.info(f"Anomaly Threshold: {self.model.threshold}")
         
         def detect_callback(packet):
@@ -81,7 +106,7 @@ class AnomalyDetector:
             if loss[0] > self.model.threshold:
                 self._alert(packet, loss[0])
 
-        sniffer = PacketSniffer(self.interface, callback=detect_callback)
+        sniffer = PacketSniffer(self.interface, callback=detect_callback, pcap_path=self.pcap_path)
         sniffer.start()
         
         try:
@@ -91,43 +116,49 @@ class AnomalyDetector:
             logger.info("Detection stopped.")
             sniffer.stop()
 
-    def _alert(self, packet, score):
-        """
-        Handle an anomaly alert.
-        """
-        alert_msg = {
-            "timestamp": time.time(),
-            "type": "Zero-Day Anomaly",
-            "score": float(score),
-            "threshold": float(self.model.threshold),
-            "summary": packet.summary() if packet else "Unknown"
-        }
-        logger.critical(json.dumps(alert_msg))
-        # Try to extract an IP address from the summary (Regex magic)
-        # Finds first public-looking IP
-        ip_match = re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', alert_msg['summary'])
-        if ip_match:
-            ip = ip_match.group(0)
-            location = self.geo.get_location(ip)
-            alert_msg['country'] = location['country']
-            alert_msg['city'] = location['city']
-            alert_msg['lat'] = location.get('lat', 0.0)
-            alert_msg['lon'] = location.get('lon', 0.0)
-        else:
-            alert_msg['country'] = "Unknown"
-            alert_msg['city'] = "Unknown"
-            alert_msg['lat'] = 0.0
-            alert_msg['lon'] = 0.0
+    def _is_whitelisted(self, packet):
+        if IP in packet:
+            src_ip = packet[IP].src
+            dst_ip = packet[IP].dst
+            if src_ip in self.whitelist or dst_ip in self.whitelist:
+                return True
+        return False
 
-        # 1. Log to File (JSON)
-        with open("anomalies.json", "a") as f:
-            f.write(json.dumps(alert_msg) + "\n")
+    def _alert(self, packet, loss):
+        """
+        Trigger an alert for an anomalous packet.
+        """
+        # Check Whitelist
+        if self._is_whitelisted(packet):
+            return
+
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        src_ip = "Unknown"
+        dst_ip = "Unknown"
         
-        # 2. Log to SQL Database (Enterprise Feature)
-        self.db.log_anomaly(alert_msg)
+        if IP in packet:
+            src_ip = packet[IP].src
+            dst_ip = packet[IP].dst
             
-        # 3. Rich CLI Output
+        location = self.geo.lookup(src_ip)
+        
+        # Console Output
         try:
-            print_alert(alert_msg)
+            print_alert(timestamp, src_ip, dst_ip, loss, location)
         except:
             pass
+        
+        # Save to Database
+        self.db.log_anomaly(timestamp, src_ip, dst_ip, float(loss), str(location))
+        
+        # EVIDENCE LOCKER: Save the malicious packet
+        self._save_evidence(packet, src_ip, timestamp)
+
+    def _save_evidence(self, packet, ip, timestamp):
+        try:
+            # Sanitize filename
+            safe_time = timestamp.replace(":", "-").replace(" ", "_")
+            filename = f"evidence/alert_{safe_time}_{ip}.pcap"
+            wrpcap(filename, packet)
+        except Exception as e:
+            logger.error(f"Failed to save evidence: {e}")
