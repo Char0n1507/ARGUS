@@ -111,6 +111,9 @@ Traditional firewalls use **Signatures** (like a fingerprint database) to stop k
 
     # Dashboard
     sudo ./venv/bin/streamlit run dashboard.py
+
+    # Generate PDF Report
+    sudo ./venv/bin/python3 -m project_alpha.src.reporting
     ```
 
 ## 🛡️ Value in a SOC / Defensive Role
